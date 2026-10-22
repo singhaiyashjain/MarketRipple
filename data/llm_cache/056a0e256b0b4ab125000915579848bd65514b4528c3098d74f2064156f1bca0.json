@@ -1,0 +1,92 @@
+{
+  "edges": [
+    {
+      "source": "usdinr",
+      "target": "fx_reserves",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "short",
+      "explanation": "Depreciation of the rupee often prompts the RBI to sell foreign exchange reserves to curb sharp volatility.",
+      "assumptions": [
+        "RBI intervenes actively in the spot FX market"
+      ]
+    },
+    {
+      "source": "usdinr",
+      "target": "it_rev",
+      "relationship": "may_benefit",
+      "sign": 1,
+      "horizon": "immediate",
+      "explanation": "A weaker rupee enhances the rupee value of dollar-denominated billing for Indian IT exporters.",
+      "assumptions": [
+        "Export contracts are primarily invoiced in US dollars without full currency hedges"
+      ]
+    },
+    {
+      "source": "it_rev",
+      "target": "tcs",
+      "relationship": "may_benefit",
+      "sign": 1,
+      "horizon": "short",
+      "explanation": "Higher rupee-converted earnings improve operating revenue and margins for major IT service providers like TCS.",
+      "assumptions": [
+        "Operational cost inflation does not offset FX translation gains"
+      ]
+    },
+    {
+      "source": "usdinr",
+      "target": "import_costs",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "immediate",
+      "explanation": "A depreciated domestic currency raises the rupee cost of purchasing foreign-priced goods and commodities.",
+      "assumptions": [
+        "Import volume elasticity is inelastic in the near term"
+      ]
+    },
+    {
+      "source": "import_costs",
+      "target": "cad",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "short",
+      "explanation": "A larger import bill expands the trade gap and widens the current account deficit.",
+      "assumptions": [
+        "Export growth does not concurrently outpace import bill growth"
+      ]
+    },
+    {
+      "source": "logistics",
+      "target": "food_prices",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "short",
+      "explanation": "Increased transport and freight expenditures are passed downstream to wholesale and retail food prices.",
+      "assumptions": [
+        "Freight operators pass higher transport expenses to agricultural distributors"
+      ]
+    },
+    {
+      "source": "home_loan",
+      "target": "housing_demand",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "medium",
+      "explanation": "Higher monthly mortgage EMIs reduce buyer affordability and defer residential property purchases.",
+      "assumptions": [
+        "Wage growth does not keep pace with rising debt servicing costs"
+      ]
+    },
+    {
+      "source": "housing_demand",
+      "target": "dlf",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "medium",
+      "explanation": "Changes in broader residential housing demand directly impact booking volumes and revenue prospects for developers like DLF.",
+      "assumptions": [
+        "Developer inventory sales depend heavily on retail real estate sentiment"
+      ]
+    }
+  ]
+}

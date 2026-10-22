@@ -1,0 +1,12 @@
+{
+  "event_type": "commodity_price_shock",
+  "entity": "Crude Oil",
+  "indicator": "crude_oil_price",
+  "direction": "increase",
+  "change": "+12%",
+  "change_pct": 12.0,
+  "driver": "escalating geopolitical tensions in the Middle East",
+  "country": null,
+  "event_date": null,
+  "source": null
+}

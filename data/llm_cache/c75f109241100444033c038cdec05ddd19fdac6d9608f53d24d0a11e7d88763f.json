@@ -1,0 +1,12 @@
+{
+  "event_type": "currency_depreciation",
+  "entity": "USD/INR",
+  "indicator": "usd_inr_exchange_rate",
+  "direction": "increase",
+  "change": null,
+  "change_pct": null,
+  "driver": "foreign investors pull money out of domestic equities",
+  "country": "India",
+  "event_date": null,
+  "source": null
+}

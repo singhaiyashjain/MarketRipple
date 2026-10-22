@@ -1,0 +1,30 @@
+{
+  "name": "finpulse-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "3d-force-graph": "^1.80.1",
+    "cytoscape": "^3.30.2",
+    "cytoscape-dagre": "^2.5.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "vite": "^5.4.2"
+  },
+  "overrides": {
+    "rollup": "npm:@rollup/wasm-node@^4.21.0",
+    "esbuild": "npm:esbuild-wasm@0.21.5"
+  }
+}

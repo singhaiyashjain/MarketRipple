@@ -1,0 +1,12 @@
+{
+  "event_type": "interest_rate_hike",
+  "entity": "Reserve Bank of India",
+  "indicator": "policy_repo_rate",
+  "direction": "increase",
+  "change": "+25 basis points",
+  "change_pct": null,
+  "driver": "elevated food and fuel prices",
+  "country": "India",
+  "event_date": null,
+  "source": null
+}

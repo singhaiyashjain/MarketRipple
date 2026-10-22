@@ -1,0 +1,667 @@
+{
+  "mode": "mock",
+  "event": {
+    "event_type": "commodity_price_shock",
+    "entity": "Crude Oil",
+    "indicator": "crude_oil_price",
+    "direction": "increase",
+    "change": "+12%",
+    "change_pct": 12.0,
+    "driver": "geopolitical tensions",
+    "country": null,
+    "event_date": null,
+    "source": "Simulated Demo Event",
+    "is_simulated": true
+  },
+  "nodes": [
+    {
+      "id": "ev_oil",
+      "label": "Crude Oil +12%",
+      "type": "event",
+      "sector": null,
+      "effect": "neutral"
+    },
+    {
+      "id": "crude",
+      "label": "Crude Oil Prices",
+      "type": "commodity",
+      "sector": "Energy",
+      "effect": "positive"
+    },
+    {
+      "id": "avfuel",
+      "label": "Aviation Fuel Costs",
+      "type": "indicator",
+      "sector": "Aviation",
+      "effect": "negative"
+    },
+    {
+      "id": "airop",
+      "label": "Airline Operating Costs",
+      "type": "indicator",
+      "sector": "Aviation",
+      "effect": "negative"
+    },
+    {
+      "id": "airmargin",
+      "label": "Airline Profit Margins",
+      "type": "indicator",
+      "sector": "Aviation",
+      "effect": "negative"
+    },
+    {
+      "id": "diesel",
+      "label": "Diesel Costs",
+      "type": "indicator",
+      "sector": "Transportation",
+      "effect": "negative"
+    },
+    {
+      "id": "logistics",
+      "label": "Logistics Costs",
+      "type": "indicator",
+      "sector": "Transportation",
+      "effect": "negative"
+    },
+    {
+      "id": "inflation",
+      "label": "Inflationary Pressure",
+      "type": "indicator",
+      "sector": "Macro",
+      "effect": "negative"
+    },
+    {
+      "id": "ratesexp",
+      "label": "Interest-Rate Expectations",
+      "type": "indicator",
+      "sector": "Macro",
+      "effect": "mixed"
+    },
+    {
+      "id": "borrow",
+      "label": "Borrowing Costs",
+      "type": "indicator",
+      "sector": "Macro",
+      "effect": "mixed"
+    },
+    {
+      "id": "banks",
+      "label": "Banks",
+      "type": "sector",
+      "sector": "Banks",
+      "effect": "mixed"
+    },
+    {
+      "id": "realestate",
+      "label": "Real Estate",
+      "type": "sector",
+      "sector": "Real Estate",
+      "effect": "mixed"
+    },
+    {
+      "id": "upstream",
+      "label": "Oil Producers' Revenue",
+      "type": "indicator",
+      "sector": "Oil & Gas",
+      "effect": "positive"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "ev_oil",
+      "target": "crude",
+      "relationship": "triggers",
+      "sign": 1,
+      "weight": 1.0,
+      "evidence_type": "news_evidence",
+      "verification_status": "supported",
+      "horizon": "immediate",
+      "explanation": "The news item reports the oil price move.",
+      "assumptions": [],
+      "evidence": [
+        {
+          "source_type": "news",
+          "text": "Crude oil prices surge by 12% amid escalating geopolitical tensions.",
+          "url": null
+        }
+      ],
+      "stats": null
+    },
+    {
+      "id": "e2",
+      "source": "crude",
+      "target": "avfuel",
+      "relationship": "influences",
+      "sign": 1,
+      "weight": 0.9,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "immediate",
+      "explanation": "Jet fuel is refined from crude; its price tracks crude closely.",
+      "assumptions": [
+        "Refining margins stay stable"
+      ],
+      "evidence": [
+        {
+          "source_type": "domain_knowledge",
+          "text": "Energy prices affect fuel input costs.",
+          "url": null
+        }
+      ],
+      "stats": null
+    },
+    {
+      "id": "e3",
+      "source": "avfuel",
+      "target": "airop",
+      "relationship": "influences",
+      "sign": 1,
+      "weight": 0.8,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "short",
+      "explanation": "Fuel is one of the largest airline operating cost items.",
+      "assumptions": [
+        "Limited hedging"
+      ],
+      "evidence": [],
+      "stats": null
+    },
+    {
+      "id": "e4",
+      "source": "airop",
+      "target": "airmargin",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "weight": 0.7,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "short",
+      "explanation": "Higher costs squeeze margins unless offset by fares, hedges or efficiency.",
+      "assumptions": [
+        "Airlines cannot fully pass on costs"
+      ],
+      "evidence": [],
+      "stats": {
+        "beta": -0.31,
+        "t_stat": -2.2,
+        "n": 9,
+        "lag_days": 3,
+        "ci_low": -0.58,
+        "ci_high": -0.04,
+        "stability": "medium",
+        "note": "ILLUSTRATIVE placeholder values — replace with computed stats. Co-movement, not causation."
+      }
+    },
+    {
+      "id": "e5",
+      "source": "crude",
+      "target": "diesel",
+      "relationship": "influences",
+      "sign": 1,
+      "weight": 0.9,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "immediate",
+      "explanation": "Diesel is a crude derivative.",
+      "assumptions": [
+        "Administered pricing may delay pass-through"
+      ],
+      "evidence": [],
+      "stats": null
+    },
+    {
+      "id": "e6",
+      "source": "diesel",
+      "target": "logistics",
+      "relationship": "influences",
+      "sign": 1,
+      "weight": 0.8,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "short",
+      "explanation": "Fuel is a major road-freight cost.",
+      "assumptions": [],
+      "evidence": [],
+      "stats": null
+    },
+    {
+      "id": "e7",
+      "source": "crude",
+      "target": "inflation",
+      "relationship": "influences",
+      "sign": 1,
+      "weight": 0.6,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "medium",
+      "explanation": "Higher energy and import costs feed into consumer prices.",
+      "assumptions": [
+        "Duration of the price rise"
+      ],
+      "evidence": [],
+      "stats": null
+    },
+    {
+      "id": "e8",
+      "source": "inflation",
+      "target": "ratesexp",
+      "relationship": "influences",
+      "sign": 1,
+      "weight": 0.6,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "medium",
+      "explanation": "Central banks may tighten when inflation rises; growth concerns can offset.",
+      "assumptions": [
+        "Policy reaction function"
+      ],
+      "evidence": [],
+      "stats": null
+    },
+    {
+      "id": "e9",
+      "source": "ratesexp",
+      "target": "borrow",
+      "relationship": "influences",
+      "sign": 1,
+      "weight": 0.7,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "medium",
+      "explanation": "Rate expectations shift lending and bond yields.",
+      "assumptions": [],
+      "evidence": [],
+      "stats": null
+    },
+    {
+      "id": "e10",
+      "source": "borrow",
+      "target": "realestate",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "weight": 0.5,
+      "evidence_type": "llm_inferred",
+      "verification_status": "unverified",
+      "horizon": "long",
+      "explanation": "Higher financing costs can dampen housing demand (indirect, uncertain).",
+      "assumptions": [
+        "Rates actually move"
+      ],
+      "evidence": [],
+      "stats": null
+    },
+    {
+      "id": "e11",
+      "source": "ratesexp",
+      "target": "banks",
+      "relationship": "influences",
+      "sign": 0,
+      "weight": 0.5,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "medium",
+      "explanation": "Net interest margin may widen, credit quality may weaken: mixed.",
+      "assumptions": [],
+      "evidence": [],
+      "stats": null
+    },
+    {
+      "id": "e12",
+      "source": "crude",
+      "target": "upstream",
+      "relationship": "influences",
+      "sign": 1,
+      "weight": 0.8,
+      "evidence_type": "domain_rule",
+      "verification_status": "reviewed",
+      "horizon": "immediate",
+      "explanation": "Producers realise higher prices; benefit depends on costs and subsidies.",
+      "assumptions": [
+        "No windfall tax"
+      ],
+      "evidence": [],
+      "stats": null
+    }
+  ],
+  "paths": [
+    {
+      "id": "p1",
+      "node_ids": [
+        "ev_oil",
+        "crude",
+        "avfuel",
+        "airop",
+        "airmargin"
+      ],
+      "edge_ids": [
+        "e1",
+        "e2",
+        "e3",
+        "e4"
+      ],
+      "strength": 0.504,
+      "terminal_effect": "negative",
+      "horizon": "short",
+      "explanation": "Higher crude raises aviation fuel and operating costs; margins may face pressure unless hedged or passed on.",
+      "uncertainty": "Hedging and fare pass-through can offset this."
+    },
+    {
+      "id": "p2",
+      "node_ids": [
+        "ev_oil",
+        "crude",
+        "diesel",
+        "logistics"
+      ],
+      "edge_ids": [
+        "e1",
+        "e5",
+        "e6"
+      ],
+      "strength": 0.72,
+      "terminal_effect": "negative",
+      "horizon": "short",
+      "explanation": "Diesel costs feed into freight and logistics expenses.",
+      "uncertainty": "Administered fuel pricing can delay pass-through."
+    },
+    {
+      "id": "p3",
+      "node_ids": [
+        "ev_oil",
+        "crude",
+        "inflation",
+        "ratesexp",
+        "borrow",
+        "realestate"
+      ],
+      "edge_ids": [
+        "e1",
+        "e7",
+        "e8",
+        "e9",
+        "e10"
+      ],
+      "strength": 0.126,
+      "terminal_effect": "negative",
+      "horizon": "long",
+      "explanation": "Inflation may shift rate expectations and financing costs, indirectly affecting real estate.",
+      "uncertainty": "Indirect and low-confidence; depends on policy response."
+    },
+    {
+      "id": "p4",
+      "node_ids": [
+        "ev_oil",
+        "crude",
+        "upstream"
+      ],
+      "edge_ids": [
+        "e1",
+        "e12"
+      ],
+      "strength": 0.8,
+      "terminal_effect": "positive",
+      "horizon": "immediate",
+      "explanation": "Producers may benefit from higher realised prices.",
+      "uncertainty": "Windfall taxes or high costs could limit gains."
+    }
+  ],
+  "sectors": [
+    {
+      "sector": "Aviation",
+      "exposure": "Cost pressure",
+      "reason": "Fuel is a major operating input.",
+      "confidence": "medium"
+    },
+    {
+      "sector": "Transportation",
+      "exposure": "Cost pressure",
+      "reason": "Diesel costs may rise.",
+      "confidence": "medium"
+    },
+    {
+      "sector": "Oil & Gas",
+      "exposure": "Potential benefit",
+      "reason": "Higher realised prices.",
+      "confidence": "medium"
+    },
+    {
+      "sector": "Real Estate",
+      "exposure": "Indirect / uncertain",
+      "reason": "Inflation → rates → financing costs.",
+      "confidence": "low"
+    }
+  ],
+  "warnings": [
+    "Mock data: the pipeline is not fully implemented yet."
+  ],
+  "meta": {
+    "stages_real": [],
+    "stages_mock": [
+      "all"
+    ],
+    "graph_analysis": {
+      "orders": {
+        "ev_oil": 0,
+        "crude": 1,
+        "avfuel": 2,
+        "diesel": 2,
+        "inflation": 2,
+        "upstream": 2,
+        "airop": 3,
+        "logistics": 3,
+        "ratesexp": 3,
+        "airmargin": 4,
+        "borrow": 4,
+        "banks": 4,
+        "realestate": 5
+      },
+      "layers": [
+        {
+          "order": 1,
+          "name": "Event link",
+          "nodes": [
+            {
+              "id": "crude",
+              "label": "Crude Oil Prices"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "name": "Direct impact",
+          "nodes": [
+            {
+              "id": "avfuel",
+              "label": "Aviation Fuel Costs"
+            },
+            {
+              "id": "diesel",
+              "label": "Diesel Costs"
+            },
+            {
+              "id": "inflation",
+              "label": "Inflationary Pressure"
+            },
+            {
+              "id": "upstream",
+              "label": "Oil Producers' Revenue"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "name": "Second-order",
+          "nodes": [
+            {
+              "id": "airop",
+              "label": "Airline Operating Costs"
+            },
+            {
+              "id": "logistics",
+              "label": "Logistics Costs"
+            },
+            {
+              "id": "ratesexp",
+              "label": "Interest-Rate Expectations"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "name": "Third-order",
+          "nodes": [
+            {
+              "id": "airmargin",
+              "label": "Airline Profit Margins"
+            },
+            {
+              "id": "banks",
+              "label": "Banks"
+            },
+            {
+              "id": "borrow",
+              "label": "Borrowing Costs"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "name": "4th-order",
+          "nodes": [
+            {
+              "id": "realestate",
+              "label": "Real Estate"
+            }
+          ]
+        }
+      ],
+      "best_paths": [
+        {
+          "target": "banks",
+          "label": "Banks",
+          "node_ids": [
+            "ev_oil",
+            "crude",
+            "inflation",
+            "ratesexp",
+            "banks"
+          ],
+          "strength": 0.18
+        },
+        {
+          "target": "realestate",
+          "label": "Real Estate",
+          "node_ids": [
+            "ev_oil",
+            "crude",
+            "inflation",
+            "ratesexp",
+            "borrow",
+            "realestate"
+          ],
+          "strength": 0.126
+        }
+      ],
+      "influence": [
+        {
+          "id": "crude",
+          "label": "Crude Oil Prices",
+          "sector": "Energy",
+          "score": 0.725,
+          "betweenness": 0.083,
+          "pagerank": 0.076
+        },
+        {
+          "id": "ratesexp",
+          "label": "Interest-Rate Expectations",
+          "sector": "Macro",
+          "score": 0.7,
+          "betweenness": 0.068,
+          "pagerank": 0.086
+        },
+        {
+          "id": "airmargin",
+          "label": "Airline Profit Margins",
+          "sector": "Aviation",
+          "score": 0.5,
+          "betweenness": 0.0,
+          "pagerank": 0.119
+        },
+        {
+          "id": "airop",
+          "label": "Airline Operating Costs",
+          "sector": "Aviation",
+          "score": 0.46,
+          "betweenness": 0.023,
+          "pagerank": 0.091
+        },
+        {
+          "id": "borrow",
+          "label": "Borrowing Costs",
+          "sector": "Macro",
+          "score": 0.457,
+          "betweenness": 0.03,
+          "pagerank": 0.084
+        }
+      ],
+      "hierarchy": [
+        {
+          "group": "Energy & Commodities",
+          "strength": 0.8,
+          "effect": "positive",
+          "sectors": [
+            {
+              "sector": "Oil & Gas",
+              "strength": 0.8,
+              "nodes": [
+                "Oil Producers' Revenue"
+              ],
+              "effect": "positive"
+            }
+          ]
+        },
+        {
+          "group": "Industrials & Transport",
+          "strength": 0.72,
+          "effect": "negative",
+          "sectors": [
+            {
+              "sector": "Transportation",
+              "strength": 0.72,
+              "nodes": [
+                "Logistics Costs"
+              ],
+              "effect": "negative"
+            },
+            {
+              "sector": "Aviation",
+              "strength": 0.504,
+              "nodes": [
+                "Airline Profit Margins"
+              ],
+              "effect": "negative"
+            }
+          ]
+        },
+        {
+          "group": "Real Assets",
+          "strength": 0.126,
+          "effect": "negative",
+          "sectors": [
+            {
+              "sector": "Real Estate",
+              "strength": 0.126,
+              "nodes": [
+                "Real Estate"
+              ],
+              "effect": "negative"
+            }
+          ]
+        }
+      ],
+      "hierarchy_problems": []
+    }
+  }
+}

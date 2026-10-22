@@ -1,0 +1,14 @@
+{
+  "_note": "Tree used for hierarchy roll-up. Level 0 root > level 1 group > level 2 sector (matches node.sector in seed_nodes.json). Level 3 = the nodes themselves. Add new sectors here before using them in seed_nodes.json (scripts/validate_seed.py checks this).",
+  "root": "Indian Economy & Markets",
+  "groups": {
+    "Macro & Policy":            ["Macro"],
+    "Energy & Commodities":      ["Energy", "Oil & Gas", "Paints & Chemicals", "Cement"],
+    "Financials":                ["Banks", "NBFCs"],
+    "Industrials & Transport":   ["Aviation", "Transportation", "Auto"],
+    "Consumer":                  ["FMCG"],
+    "Technology & Healthcare":   ["IT", "Pharma"],
+    "Real Assets":               ["Real Estate"],
+    "Markets":                   ["Markets"]
+  }
+}

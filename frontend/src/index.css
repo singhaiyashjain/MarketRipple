@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .card { @apply rounded-xl border border-line bg-panel shadow-card; }
+  .glass { @apply rounded-xl border border-line/80 bg-[#070c22]/75 shadow-float backdrop-blur-md; }
+  .section-title { @apply text-[11px] font-semibold uppercase tracking-wider text-mute; }
+  .chip { @apply inline-flex items-center rounded-full bg-paper px-2 py-0.5 text-[11px] font-medium text-mute; }
+  .btn { @apply inline-flex items-center justify-center gap-1 rounded-lg border border-line bg-[#0b1233]/80 px-2.5 py-1 text-xs font-medium text-ink transition hover:border-accent hover:text-accent hover:shadow-float disabled:opacity-40; }
+  .btn-primary { @apply w-full rounded-lg bg-gradient-to-b from-[#4c5ce8] to-accent py-2.5 text-sm font-semibold text-white shadow-[0_6px_16px_-6px_rgba(59,75,219,.7)] transition hover:brightness-110 active:translate-y-px disabled:opacity-40 disabled:shadow-none; }
+}
+
+html, body, #root { height: 100%; margin: 0; }
+body { font-variant-numeric: tabular-nums; }
+
+:focus-visible { outline: 2px solid #8a9bff; outline-offset: 2px; border-radius: 4px; }
+
+/* graph canvas: deep space */
+.canvas-grid {
+  background: radial-gradient(ellipse at 50% 40%, #0c1440 0%, #05081c 45%, #01020a 100%);
+}
+body { background: #04060f; }
+.orb-label { text-shadow: 0 0 8px rgba(138,155,255,.8); }
+
+.panel-scroll { scrollbar-width: thin; scrollbar-color: #2a376e transparent; }
+
+@keyframes reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.reveal { animation: reveal .22s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* 3D hover tooltips */
+.scene-tooltip { background: rgba(7,12,34,.92) !important; border: 1px solid #2a3878; border-radius: 8px; padding: 5px 9px !important; box-shadow: 0 0 16px rgba(110,130,255,.35); }
+.orb-tip b { display: block; font-size: 12.5px; color: #fff; }
+.orb-tip span { font-size: 11px; color: #9db0ff; }
+
+/* headline ticker */
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.ticker-track { animation: ticker 180s linear infinite; }
+.ticker-viewport:hover .ticker-track, .ticker-viewport:focus-within .ticker-track { animation-play-state: paused; }
+.ticker-viewport { scrollbar-width: none; }
+
+/* red pulsing "live" light next to the Headlines label */
+.live-dot { position: relative; width: 8px; height: 8px; border-radius: 9999px; background: #e5484d; display: inline-block; }
+.live-dot::after { content: ''; position: absolute; inset: 0; border-radius: 9999px; background: #e5484d; animation: live-pulse 1.6s ease-out infinite; }
+@keyframes live-pulse { from { transform: scale(1); opacity: .7; } to { transform: scale(2.8); opacity: 0; } }
+
+/* ---------- legibility from a distance ---------- */
+html { font-size: 17px; }
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+.orb-tip b { font-size: 0.95rem; }
+.orb-tip span { font-size: 0.82rem; color: #b9c6ff; }
+.section-title { color: #a9b6dd; letter-spacing: .08em; }
+
+/* ---------- right panel: translucent layers over the 3D scene ---------- */
+.rp-vars {
+  --lp-w: clamp(320px, 22vw, 380px);   /* left sidebar */
+  --rp-w: clamp(340px, 27vw, 460px);   /* right details panel (overlay) - the graph keeps the rest of the screen */
+}
+.rp-cols { column-width: 400px; column-gap: 1rem; }
+.rp-cols > * { break-inside: avoid; margin-bottom: 1rem; }
+
+@media (min-width: 1024px) {
+  /* layer 1: the panel itself */
+  .rp {
+    background: linear-gradient(180deg, rgba(8,13,38,.50), rgba(3,5,16,.62));
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border-left: 1px solid rgba(138,155,255,.28);
+    box-shadow: -24px 0 60px -28px rgba(0,0,0,.75), inset 1px 0 0 rgba(255,255,255,.04);
+  }
+  /* layer 2: cards on the panel (no extra blur: the panel already blurs what is behind it) */
+  .rp .card {
+    background: linear-gradient(180deg, rgba(22,32,82,.46), rgba(12,18,52,.38));
+    border-color: rgba(138,155,255,.20);
+    box-shadow: 0 10px 30px -14px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  /* layer 3: chips, inner boxes, tabs */
+  .rp .chip, .rp .rounded.bg-paper, .rp .rounded-lg.bg-paper { background: rgba(2,4,15,.42); }
+  .rp .bg-paper { background-color: rgba(2,4,15,.42); }
+}
+@media (max-width: 1023px) { .rp { background: #04060f; border-top: 1px solid #1d2859; } }
+
+/* smoother appearance of newly selected content */
+@keyframes reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.reveal { animation: reveal .42s cubic-bezier(.22,.8,.2,1) both; }

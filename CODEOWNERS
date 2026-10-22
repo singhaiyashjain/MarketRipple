@@ -1,0 +1,14 @@
+# Each member reviews PRs touching their area
+/frontend/                    @M1-frontend
+/backend/app/extraction/      @M2-nlp
+/backend/app/graph/expander.py @M2-nlp
+/backend/app/graph/            @M3-graph
+/backend/app/impact/          @M3-graph
+/backend/app/pipeline.py      @M3-graph
+/backend/app/routers/         @M3-graph
+/backend/app/evidence/        @M4-quant
+/backend/app/quant/           @M4-quant
+/backend/app/explain/         @M2-nlp
+/data/                        @M4-quant
+/eval/                        @M4-quant
+/contracts/                   @ALL   # contract changes need everyone's OK

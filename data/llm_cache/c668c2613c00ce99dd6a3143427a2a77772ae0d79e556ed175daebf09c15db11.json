@@ -1,0 +1,92 @@
+{
+  "edges": [
+    {
+      "source": "paint_costs",
+      "target": "asianpaint",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "short",
+      "explanation": "Higher crude-derivative raw material costs squeeze operating margins for paint manufacturers.",
+      "assumptions": [
+        "Pricing power is insufficient to fully pass on cost spikes immediately"
+      ]
+    },
+    {
+      "source": "logistics",
+      "target": "food_prices",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "short",
+      "explanation": "Elevated freight and transportation costs inflate the distribution expenses of agricultural produce.",
+      "assumptions": [
+        "Transportation surcharges are passed down to wholesale food markets"
+      ]
+    },
+    {
+      "source": "usdinr",
+      "target": "it_rev",
+      "relationship": "may_benefit",
+      "sign": 1,
+      "horizon": "short",
+      "explanation": "A weaker rupee against the dollar elevates rupee-denominated earnings from foreign IT client billings.",
+      "assumptions": [
+        "IT service revenues are largely USD-denominated and not fully hedged"
+      ]
+    },
+    {
+      "source": "home_loan",
+      "target": "housing_demand",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "medium",
+      "explanation": "Increased mortgage EMIs elevate homeownership costs and dampen consumer appetite for residential property.",
+      "assumptions": [
+        "Retail buyer demand is sensitive to prevailing mortgage interest rates"
+      ]
+    },
+    {
+      "source": "housing_demand",
+      "target": "cement_demand",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "medium",
+      "explanation": "Residential construction accounts for substantial cement consumption, so cooling housing demand softens cement volumes.",
+      "assumptions": [
+        "Public infrastructure spending does not entirely absorb the shortfall in private construction"
+      ]
+    },
+    {
+      "source": "packaging_costs",
+      "target": "fmcg_margin",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "short",
+      "explanation": "Surging petrochemical-based packaging expenses lift the cost of goods sold for consumer goods firms.",
+      "assumptions": [
+        "FMCG companies face competitive limits preventing immediate retail price hikes"
+      ]
+    },
+    {
+      "source": "retail_fuel",
+      "target": "auto_demand",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "short",
+      "explanation": "Higher pump prices increase ongoing vehicle ownership expenses, dampening consumer discretionary vehicle purchases.",
+      "assumptions": [
+        "Higher running costs deter prospective entry-level automobile buyers"
+      ]
+    },
+    {
+      "source": "borrow",
+      "target": "nifty",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "medium",
+      "explanation": "Tightening financial conditions and elevated corporate borrowing costs depress broader equity valuation multiples.",
+      "assumptions": [
+        "Equity discount rates increase in line with broader market yields"
+      ]
+    }
+  ]
+}

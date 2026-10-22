@@ -1,0 +1,258 @@
+[
+  {
+    "id": "e01",
+    "news": "Crude oil prices surge by 12% amid escalating geopolitical tensions.",
+    "expected_event_type": "commodity_price_shock",
+    "expected_entity": "Crude Oil",
+    "expected_sectors_affected": [
+      "Aviation",
+      "Transportation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Aviation": "-",
+      "Transportation": "-",
+      "Oil & Gas": "+"
+    }
+  },
+  {
+    "id": "e02",
+    "news": "Brent crude jumps 8% after OPEC announces deeper production cuts.",
+    "expected_event_type": "commodity_price_shock",
+    "expected_entity": "Crude Oil",
+    "expected_sectors_affected": [
+      "Aviation",
+      "Transportation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Aviation": "-",
+      "Transportation": "-",
+      "Oil & Gas": "+"
+    }
+  },
+  {
+    "id": "e03",
+    "news": "Oil prices rise 5% as supply disruptions hit Gulf shipping routes.",
+    "expected_event_type": "commodity_price_shock",
+    "expected_entity": "Crude Oil",
+    "expected_sectors_affected": [
+      "Aviation",
+      "Transportation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Aviation": "-",
+      "Transportation": "-",
+      "Oil & Gas": "+"
+    }
+  },
+  {
+    "id": "e04",
+    "news": "Crude oil prices fall 10% as global demand weakens.",
+    "expected_event_type": "commodity_price_shock",
+    "expected_entity": "Crude Oil",
+    "expected_sectors_affected": [
+      "Aviation",
+      "Transportation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Aviation": "+",
+      "Transportation": "+",
+      "Oil & Gas": "-"
+    }
+  },
+  {
+    "id": "e05",
+    "news": "Brent crude slides 6% on rising inventories and record output.",
+    "expected_event_type": "commodity_price_shock",
+    "expected_entity": "Crude Oil",
+    "expected_sectors_affected": [
+      "Aviation",
+      "Transportation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Aviation": "+",
+      "Transportation": "+",
+      "Oil & Gas": "-"
+    }
+  },
+  {
+    "id": "e06",
+    "news": "The Reserve Bank of India raises its policy repo rate by 25 basis points to curb inflation.",
+    "expected_event_type": "interest_rate_hike",
+    "expected_entity": "Reserve Bank of India",
+    "expected_sectors_affected": [
+      "Real Estate",
+      "Auto",
+      "NBFCs",
+      "Banks"
+    ],
+    "expected_signs": {
+      "Real Estate": "-",
+      "Auto": "-",
+      "NBFCs": "-"
+    }
+  },
+  {
+    "id": "e07",
+    "news": "RBI hikes the repo rate by 50 basis points in a surprise move to defend the rupee.",
+    "expected_event_type": "interest_rate_hike",
+    "expected_entity": "Reserve Bank of India",
+    "expected_sectors_affected": [
+      "Real Estate",
+      "Auto",
+      "NBFCs",
+      "Banks"
+    ],
+    "expected_signs": {
+      "Real Estate": "-",
+      "Auto": "-",
+      "NBFCs": "-"
+    }
+  },
+  {
+    "id": "e08",
+    "news": "The Reserve Bank of India raises the policy rate by 35 basis points, citing sticky food inflation.",
+    "expected_event_type": "interest_rate_hike",
+    "expected_entity": "Reserve Bank of India",
+    "expected_sectors_affected": [
+      "Real Estate",
+      "Auto",
+      "NBFCs",
+      "Banks"
+    ],
+    "expected_signs": {
+      "Real Estate": "-",
+      "Auto": "-",
+      "NBFCs": "-"
+    }
+  },
+  {
+    "id": "e09",
+    "news": "The Reserve Bank of India cuts the repo rate by 25 basis points to support growth.",
+    "expected_event_type": "interest_rate_cut",
+    "expected_entity": "Reserve Bank of India",
+    "expected_sectors_affected": [
+      "Real Estate",
+      "Auto",
+      "NBFCs",
+      "Banks"
+    ],
+    "expected_signs": {
+      "Real Estate": "+",
+      "Auto": "+",
+      "NBFCs": "+"
+    }
+  },
+  {
+    "id": "e10",
+    "news": "The Federal Reserve raises interest rates by 25 basis points, signalling more hikes ahead.",
+    "expected_event_type": "interest_rate_hike",
+    "expected_entity": "US Federal Reserve",
+    "expected_sectors_affected": [
+      "Pharma",
+      "IT",
+      "Aviation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Pharma": "+",
+      "IT": "+",
+      "Aviation": "-",
+      "Oil & Gas": "-"
+    }
+  },
+  {
+    "id": "e11",
+    "news": "The Federal Reserve lifts rates by 50 basis points as US inflation stays high.",
+    "expected_event_type": "interest_rate_hike",
+    "expected_entity": "US Federal Reserve",
+    "expected_sectors_affected": [
+      "Pharma",
+      "IT",
+      "Aviation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Pharma": "+",
+      "IT": "+",
+      "Aviation": "-",
+      "Oil & Gas": "-"
+    }
+  },
+  {
+    "id": "e12",
+    "news": "The Indian rupee falls sharply to a record low against the US dollar.",
+    "expected_event_type": "currency_depreciation",
+    "expected_entity": "USD/INR",
+    "expected_sectors_affected": [
+      "Pharma",
+      "IT",
+      "Aviation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Pharma": "+",
+      "IT": "+",
+      "Aviation": "-",
+      "Oil & Gas": "-"
+    }
+  },
+  {
+    "id": "e13",
+    "news": "The rupee weakens 2% against the dollar as foreign investors pull money out of equities.",
+    "expected_event_type": "currency_depreciation",
+    "expected_entity": "USD/INR",
+    "expected_sectors_affected": [
+      "Pharma",
+      "IT",
+      "Aviation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Pharma": "+",
+      "IT": "+",
+      "Aviation": "-",
+      "Oil & Gas": "-"
+    }
+  },
+  {
+    "id": "e14",
+    "news": "The rupee slumps to a fresh low versus the dollar on a widening trade deficit.",
+    "expected_event_type": "currency_depreciation",
+    "expected_entity": "USD/INR",
+    "expected_sectors_affected": [
+      "Pharma",
+      "IT",
+      "Aviation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Pharma": "+",
+      "IT": "+",
+      "Aviation": "-",
+      "Oil & Gas": "-"
+    }
+  },
+  {
+    "id": "e15",
+    "news": "The Indian rupee gains 1.5% against the dollar on strong foreign inflows.",
+    "expected_event_type": "currency_appreciation",
+    "expected_entity": "USD/INR",
+    "expected_sectors_affected": [
+      "Pharma",
+      "IT",
+      "Aviation",
+      "Oil & Gas"
+    ],
+    "expected_signs": {
+      "Pharma": "-",
+      "IT": "-",
+      "Aviation": "+",
+      "Oil & Gas": "+"
+    }
+  }
+]

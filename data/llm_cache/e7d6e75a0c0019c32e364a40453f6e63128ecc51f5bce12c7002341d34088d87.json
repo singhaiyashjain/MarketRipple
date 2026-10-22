@@ -1,0 +1,92 @@
+{
+  "edges": [
+    {
+      "source": "policy_rate",
+      "target": "deposit_rates",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "short",
+      "explanation": "Commercial banks typically increase deposit interest rates to mobilize funds as the central bank raises policy rates.",
+      "assumptions": [
+        "Banks face liquidity discipline and compete for retail deposits"
+      ]
+    },
+    {
+      "source": "borrow",
+      "target": "home_loan",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "short",
+      "explanation": "Rising benchmark borrowing costs lead to upward revisions in floating-rate home loan EMIs.",
+      "assumptions": [
+        "Retail home mortgages are primarily pegged to external benchmark lending rates"
+      ]
+    },
+    {
+      "source": "home_loan",
+      "target": "housing_demand",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "medium",
+      "explanation": "Increased EMI burdens diminish buyer affordability, dampening residential property transaction volumes.",
+      "assumptions": [
+        "Prospective homebuyers are sensitive to monthly financing costs"
+      ]
+    },
+    {
+      "source": "housing_demand",
+      "target": "dlf",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "medium",
+      "explanation": "Shifts in residential housing absorption directly impact sales bookings and revenue generation for major developers like DLF.",
+      "assumptions": [
+        "Developer performance relies heavily on current residential presales momentum"
+      ]
+    },
+    {
+      "source": "borrow",
+      "target": "nbfc_funding",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "short",
+      "explanation": "Tighter financial conditions lift wholesale borrowing costs and bond issuance yields for non-banking financial companies.",
+      "assumptions": [
+        "NBFCs rely materially on bank credit and corporate bond markets for liquidity"
+      ]
+    },
+    {
+      "source": "deposit_rates",
+      "target": "nim",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "medium",
+      "explanation": "Subsequent upward repricing of retail and bulk deposits increases bank funding costs, compressing net interest margins.",
+      "assumptions": [
+        "Deposit cost catch-up eventually outpaces further loan yield expansion"
+      ]
+    },
+    {
+      "source": "housing_demand",
+      "target": "cement_demand",
+      "relationship": "influences",
+      "sign": 1,
+      "horizon": "medium",
+      "explanation": "A moderation in real estate construction starts softens overall demand for cement and building materials.",
+      "assumptions": [
+        "Housing accounts for a significant share of domestic cement consumption"
+      ]
+    },
+    {
+      "source": "borrow",
+      "target": "auto_demand",
+      "relationship": "may_pressure",
+      "sign": -1,
+      "horizon": "medium",
+      "explanation": "Elevated retail vehicle financing rates raise effective acquisition costs, suppressing discretionary automotive purchases.",
+      "assumptions": [
+        "A substantial proportion of passenger and commercial vehicle sales relies on auto loans"
+      ]
+    }
+  ]
+}

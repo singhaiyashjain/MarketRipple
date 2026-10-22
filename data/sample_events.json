@@ -1,0 +1,12 @@
+[
+  {"id": "oil_shock", "title": "Crude oil +12% (simulated)", "simulated": true,
+   "news": "Crude oil prices surge by 12% amid escalating geopolitical tensions in the Middle East, raising concerns about supply disruptions."},
+  {"id": "rate_hike", "title": "RBI rate hike (simulated)", "simulated": true,
+   "news": "The Reserve Bank of India raises its policy repo rate by 25 basis points to curb persistent inflation, citing elevated food and fuel prices."},
+  {"id": "inr_depreciation", "title": "Rupee depreciation (simulated)", "simulated": true,
+   "news": "The Indian rupee falls sharply to a record low against the US dollar as foreign investors pull money out of domestic equities."},
+  {"id": "fed_hike", "title": "US Fed hike (simulated)", "simulated": true,
+   "news": "The US Federal Reserve raises its policy interest rate by 50 basis points and signals further tightening, strengthening the dollar."},
+  {"id": "food_inflation", "title": "Food price spike (simulated)", "simulated": true,
+   "news": "Vegetable and cereal prices spike after erratic rains, pushing food inflation sharply higher and raising pressure on household budgets."}
+]
