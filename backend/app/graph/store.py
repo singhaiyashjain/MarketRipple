@@ -9,19 +9,31 @@ import time
 from datetime import datetime, timezone
 from app.config import settings
 
-_client = None
+_client_obj = None
 _retry_after = 0.0          # monotonic time before which we do not try MongoDB again
 BACKOFF_S = 60
 
 
-def _collection():
-    global _client
+def _collection(name: str = "analyses"):
+    global _client_obj
     if not settings.mongodb_uri:
         raise RuntimeError("MONGODB_URI is not set - analyses are not saved")
     from pymongo import MongoClient
-    if _client is None:
-        _client = MongoClient(settings.mongodb_uri, serverSelectionTimeoutMS=2000)
-    return _client[settings.mongodb_db]["analyses"]
+    if _client_obj is None:
+        _client_obj = MongoClient(settings.mongodb_uri, serverSelectionTimeoutMS=2000)
+    return _client_obj[settings.mongodb_db][name]
+
+
+def guard() -> None:
+    """Raise RuntimeError while MongoDB is in back-off after a recent failure."""
+    if time.monotonic() < _retry_after:
+        raise RuntimeError("MongoDB unavailable recently - skipping")
+
+
+def failed() -> None:
+    """Record a MongoDB failure: start the back-off window."""
+    global _retry_after
+    _retry_after = time.monotonic() + BACKOFF_S
 
 
 def _to_id(analysis_id: str):
@@ -36,15 +48,13 @@ def _to_id(analysis_id: str):
 
 def save_analysis(response_json: dict) -> str:
     """Store one analysis response; returns its id as a string."""
-    global _retry_after
-    if time.monotonic() < _retry_after:
-        raise RuntimeError("MongoDB unavailable recently - skipping save")
+    guard()
     try:
         doc = {"created_at": datetime.now(timezone.utc),
                "response": json.loads(json.dumps(response_json))}      # guarantees BSON-safe plain data
         return str(_collection().insert_one(doc).inserted_id)
     except Exception:
-        _retry_after = time.monotonic() + BACKOFF_S
+        failed()
         raise
 
 
