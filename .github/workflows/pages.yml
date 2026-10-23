@@ -27,10 +27,10 @@ jobs:
       - name: Install dependencies
         working-directory: frontend
         run: npm ci
-      - name: Build (demo mode, no backend needed)
+      - name: Build (connected to the Render backend)
         working-directory: frontend
         env:
-          VITE_USE_MOCK: "true"
+          VITE_API_URL: ${{ vars.API_URL }}
           VITE_BASE: /${{ github.event.repository.name }}/
         run: npm run build
       - uses: actions/upload-pages-artifact@v3
