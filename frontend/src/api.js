@@ -2,6 +2,10 @@ import mock from '@contracts/sample_response.json'
 
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
+// Backend address. Empty = same site (local dev uses the Vite proxy). On GitHub Pages set VITE_API_URL to the Render URL.
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
+const fetch = (url, opts) => window.fetch(API_BASE + url, opts)
+
 const MOCK_SAMPLES = [
   { id: 'oil_shock', title: 'Crude oil +12% (simulated)', simulated: true,
     news: 'Crude oil prices surge by 12% amid escalating geopolitical tensions in the Middle East, raising concerns about supply disruptions.' },
