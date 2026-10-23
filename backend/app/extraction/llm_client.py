@@ -168,3 +168,4 @@ def complete_json(prompt: str, schema_hint: dict | None = None, use_cache: bool 
     if use_cache:
         _cache_write(prompt, data)
     return data
+    #aadityaftw
