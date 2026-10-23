@@ -1,56 +1,209 @@
-# data/
-- `seed_nodes.json`, `seed_edges.json` — curated trusted graph (**56 nodes / 79 edges**, India-focused; grow toward ~100 / 200 only with reviewed edges). Owner M4.
-- `tickers.json` — node id -> yfinance ticker for quant edge stats (proxies; see its `_note`).
-- `sample_events.json` — curated demo events (label simulated ones!).
-- `cache/` — price CSVs from `scripts/fetch_prices.py` (commit them).
-- `llm_cache/` — cached LLM responses so demos work offline (commit them).
-- `demo_cache/` — full pre-computed responses for the sample events, from `scripts/build_demo_cache.py` (commit them).
+<div align="center">
 
-## Node fields
-`id, label, type, sector, polarity`
-- `type` ∈ event · commodity · indicator · sector · company · index · currency · policy · country
-- `polarity` — is an INCREASE of this variable good or bad for its sector?
-  **+1** good (revenue, margins, demand, prices of equities) · **−1** bad (costs, inflation, borrowing cost, geopolitical risk) · **0** ambiguous (USD/INR, rates, policy nodes, crude itself).
-  A path's sign says which way the end variable moves; `effect = direction × polarity` says whether that is good or bad.
-  Nodes with polarity 0 are never used as the end-point of a sector-exposure statement.
-- Company nodes (`type: company`) are illustrative exposures through a sector, **not recommendations**.
+# MarketRipple (FinPulse AI)
 
-## Edge fields
-`id, source, target, relationship, sign(+1/−1/0), weight(0–1, from rubric), evidence_type, horizon, explanation, assumptions[]`
-- `sign`: +1 target moves the same way as source · −1 opposite · 0 mixed/uncertain.
-- Optional: `reference` (+ `reference_url`) — a citable source, shown in the evidence panel. Add only real, checked sources.
+**See how one news headline ripples through sectors, assets and companies.**
 
-## Weight rubric (document any change here)
-| Weight | Meaning |
-|---|---|
-| 0.95 | definitional (an institution sets the variable, e.g. RBI sets the repo rate) |
-| 0.9 | near-mechanical link |
-| 0.7 | strong, well-established |
-| 0.5 | moderate / conditional |
-| 0.3 | weak / indirect |
-| 0.8 / 0.6 / 0.4 | between the tiers above |
+[![CI](https://github.com/singhaiyashjain/MarketRipple/actions/workflows/ci.yml/badge.svg)](https://github.com/singhaiyashjain/MarketRipple/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/live%20demo-open-6c7bff)](https://singhaiyashjain.github.io/MarketRipple/)
 
-Weights are a **relative rubric score**, not a probability. Path strength = product of weights.
+### 👇 Click the picture to open the live project 👇
 
-## Rules for editing the graph
-1. Run `python scripts/validate_seed.py` and `pytest backend/tests/test_seed_data.py` before every commit.
-2. One causal claim per edge, with an explanation a judge could read aloud and at least one assumption where it can fail.
-3. Prefer first-order links. Avoid edges that create long circular feedback loops (they produce contradictory paths). The one known cycle is `import_costs → cad → usdinr → import_costs`; the path engine must use simple paths (no repeated node).
-4. Removed on purpose: `policy_rate → usdinr` (it created a weak 5-hop path claiming a rate *hike* lowers borrowing costs). Edge ids are not reused, so `s56` is intentionally absent.
-5. Every edge starts as `domain_rule`; it only becomes `quant_verified` when `quant.edge_stats` finds significant, stable, same-sign historical data.
+[![MarketRipple: click to open the live project](docs/preview.png)](https://singhaiyashjain.github.io/MarketRipple/)
+
+[**Open live project**](https://singhaiyashjain.github.io/MarketRipple/) · [API docs](https://marketripple.onrender.com/docs)
+
+</div>
+
+Paste a headline about a rate decision, a commodity move or a currency shock, and MarketRipple turns it into an interactive 3D "night sky" graph. Each star is a sector, asset or company. Each link has a reason, a source and a historical check behind it.
+
+> The hosted site may take 30-60 seconds to respond on the first request, because the free backend sleeps when idle.
 
 ---
-## Graph algorithms & hierarchy (mentor requirements)
-| Need | Where | What it does |
+
+## What it does
+
+- **Reads the news.** Extracts the event (type, entity, indicator, direction, change, driver, country, date). Anything not in the text is left empty, never guessed.
+- **Traces the spread.** Searches a curated, India-focused graph (61 nodes, 84 edges) for the strongest paths, up to 5 hops.
+- **Shows the evidence.** Every link has an explanation, a source or rule, the conditions it depends on, and, where data exists, historical statistics. Links proposed by the AI are clearly marked as unverified.
+- **Shows sector exposure.** Which sectors may benefit or come under pressure (illustrative, not investment advice).
+- **Watches the news live.** Polls RSS feeds (and optionally NewsAPI), analyses new events and replays the ripple.
+- **Flags recurring bad news.** Stars that keep getting negative stories blink as alerts.
+- **Checks history.** "The last 5 times this happened": past shocks to the same driver and what moved afterwards.
+
+### Main features
+
+| Area | Features |
+|---|---|
+| Input | Paste text, sample events, Ctrl+Enter to run, live headline ticker, latest-news panel |
+| 3D graph | Orbit, zoom, pan, fit, re-layout, snapshot, ripple playback hop by hop, first-person view from any star, min-weight and AI-link filters |
+| Explanation | Ranked impact paths, evidence panel, stability badge, sector exposure table, hierarchy roll-up, key transmission nodes |
+| Live monitor | Region switch (India, Global, All), auto-update, replay demo mode, "check news now" |
+| Alerts | Recurring-news alerts (alert and watch levels, trend), optional auto-open of the alerting star |
+| History | Event-study backtest with a "history agrees or disagrees" verdict, only when statistically significant |
+| Reliability | Works with no AI key (cached responses and rule-based fallback), optional backup AI provider |
+
+## How it works
+
+```
+news text
+   -> extraction (AI, cached, or rule-based fallback)
+   -> graph builder (curated seed graph + AI-proposed edges, tagged as inferred)
+   -> impact engine (sign-aware bounded path search, top-k by strength)
+   -> evidence (quotes and rules, verified)
+   -> quant (event study, beta, lag from cached prices)
+   -> sector exposure + plain-English explanations
+   -> JSON response -> React / three.js frontend
+```
+
+The AI structures text and proposes links. The graph and rules decide the structure. Historical data verifies. The interface shows uncertainty. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`docs/NEW_FEATURES.md`](docs/NEW_FEATURES.md) for details.
+
+## Tech stack
+
+- **Frontend:** React 18, Vite, Tailwind CSS, 3d-force-graph and three.js
+- **Backend:** Python, FastAPI, pydantic, networkx, pandas, statsmodels, yfinance
+- **Storage (optional):** MongoDB for saved analyses and the recurring-news log
+- **AI providers (optional):** Gemini, Anthropic, OpenAI or Groq
+- **CI/CD:** GitHub Actions (tests and build), GitHub Pages (frontend), Render (backend)
+
+## Project structure
+
+```
+backend/app/       FastAPI app: extraction, graph, impact, evidence, quant, live, recurrence, chat
+backend/tests/     pytest suite (89 tests, no network needed)
+frontend/src/      React app: components, hooks, 3D graph
+data/              seed graph, hierarchy, tickers, sample events, price and AI caches
+contracts/         API contract and sample response
+docs/              architecture, features, demo script
+scripts/           data validation, price fetching, demo cache, evaluation
+eval/              labelled events for evaluation
+```
+
+## Getting started
+
+**Requirements:** Python 3.11+ and Node.js 20+.
+
+### 1. Backend
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+The API docs open at http://localhost:8000/docs.
+
+### 2. Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173. In development, Vite proxies `/api` to port 8000.
+
+On Linux, macOS or Git Bash, `scripts/run_dev.sh` starts both together.
+
+**UI only, no backend:** put `VITE_USE_MOCK=true` in `frontend/.env.local`. You get one canned example and no live features.
+
+### 3. Optional: real AI analysis
+
+Create a `.env` file in the repository root. It is git-ignored, so never commit it.
+
+```env
+LLM_PROVIDER=gemini        # gemini | anthropic | openai | groq | none
+LLM_API_KEY=your-key
+LLM_MODEL=model-name
+```
+
+With no key, the app uses cached responses and rule-based extraction.
+
+## Configuration
+
+All settings are environment variables (or entries in the root `.env`).
+
+| Variable | Default | Purpose |
 |---|---|---|
-| Graph algorithms | `backend/app/impact/layers.py` | BFS impact order (1st/2nd/3rd-order), Dijkstra strongest chain per sector (cost = -log weight = max product of weights), betweenness + PageRank to rank key transmission nodes. `impact/engine.py` keeps the bounded `all_simple_paths` enumeration. |
-| Hierarchy | `data/hierarchy.json`, `backend/app/graph/hierarchy.py` | Economy > group > sector > node; `roll_up()` aggregates path impact up the tree. |
-| Hierarchy maintenance | `backend/app/graph/maintenance.py`, `scripts/validate_seed.py` | validate tree vs nodes, attach new nodes under a sector without duplicates, reject unknown sectors. |
-| Output | `response.meta.graph_analysis` | Optional field; contract unchanged. UI: `HierarchyPanel.jsx`, `InfluencePanel.jsx`. |
+| `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL` | none | Primary AI provider |
+| `FALLBACK_PROVIDER`, `FALLBACK_API_KEY`, `FALLBACK_MODEL` | none | Backup provider used if the primary fails |
+| `MONGODB_URI`, `MONGODB_DB` | empty, `finpulse` | Save analyses and the recurring-news log. Empty means in-memory only |
+| `FORCE_MOCK` | `false` | Always use mock responses |
+| `USE_LLM_CACHE` | `true` | Reuse cached AI responses |
+| `LIVE_ENABLED`, `LIVE_POLL_SECONDS` | `true`, `300` | Live news monitor and its polling interval |
+| `NEWS_API_PROVIDER`, `NEWS_API_KEY` | none | Optional NewsAPI source |
+| `RECUR_WINDOW_DAYS`, `RECUR_ALERT_HITS`, `RECUR_WATCH_HITS`, `RECUR_HALF_LIFE_DAYS` | `7`, `3`, `2`, `3.0` | Recurring-news alert thresholds |
 
-Tests: `pytest` (full) or `python backend/tests/run_plain.py` (graph/evidence tests, no pydantic needed).
-Before demo: `python scripts/fetch_prices.py` (needs internet, then commit `data/cache/`), `python scripts/build_demo_cache.py`, `python scripts/evaluate.py`.
+Frontend build settings: `VITE_USE_MOCK` (demo mode), `VITE_API_URL` (backend address when the site is hosted separately) and `VITE_BASE` (sub-path for GitHub Pages).
 
+## Testing
 
-## Recurring-news alerts + historical backtest
-Stars that keep getting negative news blink and open; every analysis can be checked against 10 years of prices ("the last 5 times this happened"). See [docs/NEW_FEATURES.md](docs/NEW_FEATURES.md).
+```bash
+python scripts/validate_seed.py        # from the repo root: checks the seed graph data
+cd backend && pytest -q                # backend tests
+```
+
+```bash
+cd frontend
+npm run build
+```
+
+GitHub Actions runs the same checks on every push and pull request (`.github/workflows/ci.yml`).
+
+Useful data scripts (run from the repo root):
+
+```bash
+python scripts/fetch_prices.py        # download price history into data/cache (needs internet)
+python scripts/build_demo_cache.py    # pre-compute responses for the sample events
+python scripts/evaluate.py            # evaluate against eval/labeled_events.json
+```
+
+## Deployment
+
+| Part | Where | How |
+|---|---|---|
+| Frontend | GitHub Pages | `.github/workflows/pages.yml` builds `frontend/` and publishes it on every push to `main` |
+| Backend | Render (web service) | Root directory `backend`; build `pip install -r requirements.txt`; start `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+
+To connect the hosted frontend to the backend, add a repository variable named `API_URL` (Settings, Secrets and variables, Actions, Variables) set to the backend URL with no trailing slash. In the Pages workflow, build with `VITE_API_URL: ${{ vars.API_URL }}` instead of `VITE_USE_MOCK: "true"`.
+
+Add AI keys and `MONGODB_URI` as environment variables in the Render dashboard, never in code.
+
+## API overview
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/analyze` | Analyse a news text |
+| GET | `/api/samples` | Sample events |
+| GET | `/api/edges/{id}`, `/api/analyses/{id}` | One edge, or a saved analysis |
+| GET | `/api/headlines` | Latest headlines |
+| GET, POST | `/api/live/status`, `/events`, `/poll`, `/fire`, `/replay` | Live monitor |
+| GET, DELETE | `/api/recurrence` | Recurring-news signals, or clear the history |
+| GET | `/api/recurrence/{node_id}/backtest` | "Last 5 times" for a recurring star |
+| POST | `/api/backtest` | Historical backtest for an analysis |
+| POST | `/api/chat` | Grounded analyst answers, English or Hindi (backend only; no screen in the UI yet) |
+
+The full request and response shapes are in [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md) and `contracts/`.
+
+## Limitations
+
+- Output is **illustrative, not investment advice**. "Negative effect" is the graph's label for a node, not a price forecast.
+- Historical statistics show co-movement, **not causation**. They use proxy tickers (futures and indices), daily data and small samples.
+- Alerts only count stories the graph can map to a node.
+- Nodes without a ticker (for example inflation or bond yields) cannot be backtested.
+- Storage has been tested against a fake MongoDB (mongomock), not a real server.
+- The GitHub Pages demo runs without a backend unless `API_URL` is configured.
+
+## Data
+
+The graph, weights, hierarchy and editing rules are described in [`data/README.md`](data/README.md).
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). In short: branch per task, small commits, one reviewer on pull requests, never commit `.env` or API keys, and keep `main` green.
+
+## License
+
+No license has been added yet. Add a `LICENSE` file to state how others may use this project.
