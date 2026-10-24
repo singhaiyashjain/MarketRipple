@@ -193,7 +193,6 @@ The full request and response shapes are in [`docs/API_CONTRACT.md`](docs/API_CO
 - Historical statistics show co-movement, **not causation**. They use proxy tickers (futures and indices), daily data and small samples.
 - Alerts only count stories the graph can map to a node.
 - Nodes without a ticker (for example inflation or bond yields) cannot be backtested.
-- Storage has been tested against a fake MongoDB (mongomock), not a real server.
 - The GitHub Pages demo runs without a backend unless `API_URL` is configured.
 
 ## Data
