@@ -13,7 +13,7 @@ export default function Header({ mode, warnings = [], hasData, onReset }) {
           <circle cx="19" cy="19" r="2.4" fill="#f4a49a" />
           <path d="M7 12 L17 5.6 M7 12 L17 18.4" stroke="#fff" strokeWidth="1.5" fill="none" />
         </svg>
-        <h1 className="font-semibold tracking-tight text-[1.1rem] whitespace-nowrap">FinPulse <span className="text-[#9db0ff]">AI</span></h1>
+        <h1 className="font-semibold tracking-tight text-[1.1rem] whitespace-nowrap">Market<span className="text-[#9db0ff]">Ripple</span></h1>
         <span className="hidden md:inline text-sm text-white/55 border-l border-white/15 pl-3">Trace how one event spreads through sectors and assets</span>
         <div className="ml-auto flex items-center gap-2">
           {info && (
