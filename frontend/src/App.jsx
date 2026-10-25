@@ -23,6 +23,7 @@ import EmptyState from './components/EmptyState'
 import RecurrencePanel from './components/RecurrencePanel'
 import BacktestPanel from './components/BacktestPanel'
 import Landing from './components/Landing'
+import Login from './components/Login'
 
 const DEFAULT_FILTERS = { showInferred: true, minWeight: 0 }
 
@@ -290,8 +291,24 @@ function Dashboard() {
   )
 }
 
-// Landing page first; "Launch app" / "Analyze an event" opens the dashboard above.
+// Flow: landing -> login -> dashboard.
+// DEMO LOGIN ONLY: the backend has no auth endpoint yet, so this checks a
+// hard-coded account in the browser. Not real security. Replace demoLogin with
+// a fetch() to your backend later (throw an Error on wrong credentials).
+const DEMO_USER = 'demo'
+const DEMO_PASS = 'marketripple'
+async function demoLogin({ username, password }) {
+  if (username !== DEMO_USER || password !== DEMO_PASS) {
+    throw new Error('Wrong username or password.')
+  }
+  return { username }
+}
+
 export default function App() {
-  const [showLanding, setShowLanding] = useState(true)
-  return showLanding ? <Landing onLaunch={() => setShowLanding(false)} /> : <Dashboard />
+  const [stage, setStage] = useState('landing') // 'landing' | 'login' | 'app'
+  if (stage === 'landing') return <Landing onLaunch={() => setStage('login')} />
+  if (stage === 'login') {
+    return <Login onLogin={demoLogin} onSuccess={() => setStage('app')} onBack={() => setStage('landing')} />
+  }
+  return <Dashboard />
 }
