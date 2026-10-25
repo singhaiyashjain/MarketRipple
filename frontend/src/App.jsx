@@ -33,7 +33,7 @@ function Dashboard() {
   const live = useLiveEvents(region)
 
   // recurring-news alerts: stars with repeated negative news blink; their history is the "last 5 times" backtest
-  const [recSettings, setRecSettings] = useState({ windowDays: 7, includeSimulated: true, autoOpen: true })
+  const [recSettings, setRecSettings] = useState({ windowDays: 7, includeSimulated: true, autoOpen: false })
   const [focusStar, setFocusStar] = useState(null)         // star whose recurring-news backtest is shown
   const announced = useRef(new Set())                      // `${analysis}:${star}` already auto-opened
 
