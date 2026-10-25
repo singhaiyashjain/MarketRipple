@@ -154,7 +154,7 @@ const ImpactGraph3D = forwardRef(function ImpactGraph3D({ data, selectedPath, se
       if (!cv) return
       const a = document.createElement('a')
       a.href = cv.toDataURL('image/png')
-      a.download = 'marketripple-impact-graph.png'
+      a.download = 'finpulse-impact-graph.png'
       a.click()
     },
   }))

@@ -29,7 +29,7 @@ const ImpactGraph = forwardRef(function ImpactGraph({ data, selectedPath, select
       if (!cy) return
       const a = document.createElement('a')
       a.href = cy.png({ full: true, scale: 2, bg: '#f7f9fb' })
-      a.download = 'marketripple-impact-graph.png'
+      a.download = 'finpulse-impact-graph.png'
       a.click()
     },
   }))

@@ -22,17 +22,18 @@ import InfluencePanel from './components/InfluencePanel'
 import EmptyState from './components/EmptyState'
 import RecurrencePanel from './components/RecurrencePanel'
 import BacktestPanel from './components/BacktestPanel'
+import Landing from './components/Landing'
 
 const DEFAULT_FILTERS = { showInferred: true, minWeight: 0 }
 
-export default function App() {
+function Dashboard() {
   const { data, loading, error, run, reset, load } = useAnalysis()
   const [region, setRegion] = useState('all')              // 'india' | 'global' | 'all'
   const headlines = useHeadlines(region)
   const live = useLiveEvents(region)
 
   // recurring-news alerts: stars with repeated negative news blink; their history is the "last 5 times" backtest
-  const [recSettings, setRecSettings] = useState({ windowDays: 7, includeSimulated: true, autoOpen: false })
+  const [recSettings, setRecSettings] = useState({ windowDays: 7, includeSimulated: true, autoOpen: true })
   const [focusStar, setFocusStar] = useState(null)         // star whose recurring-news backtest is shown
   const announced = useRef(new Set())                      // `${analysis}:${star}` already auto-opened
 
@@ -287,4 +288,10 @@ export default function App() {
       </main>
     </div>
   )
+}
+
+// Landing page first; "Launch app" / "Analyze an event" opens the dashboard above.
+export default function App() {
+  const [showLanding, setShowLanding] = useState(true)
+  return showLanding ? <Landing onLaunch={() => setShowLanding(false)} /> : <Dashboard />
 }
