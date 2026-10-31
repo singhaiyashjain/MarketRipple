@@ -23,7 +23,18 @@ _DRIVERS = [
     re.compile(r"\bfollowing\s+([^,.;]+)", re.I),
 ]
 
+# Other oils (palm, edible, olive...) and company names ("Oil India") are masked out
+# so they cannot trigger the crude-oil shock.
+_NON_CRUDE_OIL = re.compile(
+    r"\b(?:palm|edible|olive|vegetable|cooking|mustard|coconut|sunflower|soybean|soya|groundnut|castor|essential|"
+    r"fish|engine|lubricating|hair|baby|massage)\s+oils?\b|\boil\s+india\b|\boil\s+(?:and|&)\s+natural\s+gas\b|"
+    r"\boil\s+marketing\s+compan\w+|\boil\s+ministry\b", re.I)
+_CRUDE = re.compile(r"\b(crude|brent|wti|opec|oil prices?|oil)\b", re.I)
 
+
+def _crude_match(text: str):
+    masked = _NON_CRUDE_OIL.sub(lambda m: " " * len(m.group(0)), text)
+    return _CRUDE.search(masked)
 def _direction(text: str) -> str:
     """Direction word that appears first in the text (up vs down)."""
     up = re.search(rf"\b(?:{_UP})\b", text, re.I)
@@ -81,7 +92,7 @@ def rule_based_extract(news: str) -> ExtractedEvent:
 
     # 2) rupee move vs 3) crude oil: if a text mentions both, the one named first is the headline
     inr = re.search(r"\b(rupee|inr)\b", text, re.I)
-    oil = re.search(r"\b(crude|brent|wti|oil prices?|oil)\b", text, re.I)
+    oil = re.search(text)
     if inr and not (oil and oil.start() < inr.start()):
         # entity is the pair; rupee falling => USD/INR increases
         weak = re.search(r"\b(fall[s]?|fell|slump\w*|weaken\w*|deprecia\w+|record low|slide[s]?|plunge\w*|sink\w*|tumbl\w+)\b", text, re.I)
