@@ -35,7 +35,14 @@ def _mock(req: AnalyzeRequest, reason: str, unmapped: bool = False) -> AnalyzeRe
     data["meta"] = {**(data.get("meta") or {}), "unmapped": unmapped, "unmapped_reason": reason if unmapped else None}
     return AnalyzeResponse(**data)
 
-
+def _unmapped(event, reason: str) -> AnalyzeResponse:
+    """Real story, but the graph has no path for it. Return an EMPTY result with the real event,
+    never the canned crude-oil sample."""
+    return AnalyzeResponse(
+        mode="mock", event=event, nodes=[], edges=[], paths=[], sectors=[],
+        warnings=[f"Not mapped: {reason}"],
+        meta={"stages_real": ["extraction"], "stages_mock": [], "unmapped": True, "unmapped_reason": reason},
+    )
 def run_analysis(req: AnalyzeRequest) -> AnalyzeResponse:
     if settings.force_mock:
         return _mock(req, "FORCE_MOCK=true")
@@ -43,7 +50,7 @@ def run_analysis(req: AnalyzeRequest) -> AnalyzeResponse:
     try:
         event = extract_event(req.news, use_llm=req.use_llm)
     except NotImplementedError:
-        return _mock(req, "stage 'extraction' not implemented yet")
+          return _unmapped(event, "no impact paths found for this event: " + " ".join(warnings))
     event.is_simulated = event.is_simulated or req.simulated
 
     G = build_graph(event, use_llm=req.use_llm)
