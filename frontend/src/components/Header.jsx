@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { MODE_INFO } from '../lib/format'
 
-export default function Header({ mode, warnings = [], hasData, onReset }) {
+export default function Header({ mode, warnings = [], hasData, onReset, user, onAdmin, onLogout }) {
   const [open, setOpen] = useState(false)
   const info = MODE_INFO[mode]
   return (
@@ -23,6 +23,16 @@ export default function Header({ mode, warnings = [], hasData, onReset }) {
             <button onClick={() => setOpen((o) => !o)} aria-expanded={open}
               className="text-xs px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition">
               {warnings.length} {warnings.length === 1 ? 'note' : 'notes'}
+            </button>
+          )}
+          {user && onAdmin && user.role === 'admin' && (
+            <button onClick={onAdmin} className="text-xs px-3 py-1 rounded-full border border-white/30 hover:bg-white/15 transition font-medium">
+              Admin
+            </button>
+          )}
+          {user && onLogout && (
+            <button onClick={onLogout} title={`Signed in as ${user.username}`} className="text-xs px-3 py-1 rounded-full border border-white/30 hover:bg-white/15 transition font-medium">
+              Sign out
             </button>
           )}
           {hasData && (

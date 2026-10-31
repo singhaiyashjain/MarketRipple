@@ -130,6 +130,10 @@ All settings are environment variables (or entries in the root `.env`).
 | `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL` | none | Primary AI provider |
 | `FALLBACK_PROVIDER`, `FALLBACK_API_KEY`, `FALLBACK_MODEL` | none | Backup provider used if the primary fails |
 | `MONGODB_URI`, `MONGODB_DB` | empty, `finpulse` | Save analyses and the recurring-news log. Empty means in-memory only |
+| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | empty | First admin account. Created at startup; the password follows this variable (change it and restart if you are locked out) |
+| `AUTH_SECRET` | random per start | Long random string that signs login tokens. Set it on Render, or everyone is logged out on each restart |
+| `AUTH_REQUIRED` | `false` | `true` = every data API route needs a login token (login and admin routes are always available) |
+| `AUTH_TOKEN_HOURS` | `12` | How long a login lasts |
 | `FORCE_MOCK` | `false` | Always use mock responses |
 | `USE_LLM_CACHE` | `true` | Reuse cached AI responses |
 | `LIVE_ENABLED`, `LIVE_POLL_SECONDS` | `true`, `300` | Live news monitor and its polling interval |

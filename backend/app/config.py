@@ -38,6 +38,14 @@ class Settings(BaseSettings):
     recur_half_life_days: float = 3.0   # older stories count less in the decayed score
     news_api_provider: str = "none"   # none | newsapi
     news_api_key: str = ""
+    # login + admin panel (users live in MongoDB collection "users"; in memory if MONGODB_URI is empty)
+    auth_secret: str = ""             # signs login tokens. Set a long random value on Render, or logins end on every restart
+    auth_required: bool = False       # True = every /api data route needs a valid login token
+    auth_token_hours: int = 12
+    admin_username: str = ""          # bootstrap admin, created/updated at startup (needs both values)
+    admin_password: str = ""
+    auth_max_failures: int = 5        # wrong passwords before a short lockout
+    auth_lockout_seconds: int = 300
 
 
 settings = Settings()

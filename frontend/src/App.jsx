@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { clearRecurrence, fireNext, getEventByVersion, getSamples, pollNow, setReplay } from './api'
+import { clearRecurrence, fireNext, getEventByVersion, getMe, getSamples, getToken, login, logout, pollNow, setReplay, setUnauthorizedHandler } from './api'
 import useAnalysis from './hooks/useAnalysis'
 import useHeadlines from './hooks/useHeadlines'
 import useLiveEvents from './hooks/useLiveEvents'
@@ -24,10 +24,11 @@ import RecurrencePanel from './components/RecurrencePanel'
 import BacktestPanel from './components/BacktestPanel'
 import Landing from './components/Landing'
 import Login from './components/Login'
+import Admin from './components/Admin'
 
 const DEFAULT_FILTERS = { showInferred: true, minWeight: 0 }
 
-function Dashboard() {
+function Dashboard({ user, onAdmin, onLogout }) {
   const { data, loading, error, run, reset, load } = useAnalysis()
   const [region, setRegion] = useState('all')              // 'india' | 'global' | 'all'
   const headlines = useHeadlines(region)
@@ -210,7 +211,8 @@ function Dashboard() {
 
   return (
     <div className="h-full flex flex-col">
-      <Header mode={data?.mode} warnings={data?.warnings ?? []} hasData={!!data} onReset={onReset} />
+      <Header mode={data?.mode} warnings={data?.warnings ?? []} hasData={!!data} onReset={onReset}
+        user={user} onAdmin={onAdmin} onLogout={onLogout} />
       <HeadlineTicker items={headlines.items} feeds={headlines.feeds} stale={headlines.stale}
         loading={headlines.loading} error={headlines.error} onAnalyze={onAnalyzeHeadline}
         showRegion={region === 'all'} />
@@ -291,24 +293,33 @@ function Dashboard() {
   )
 }
 
-// Flow: landing -> login -> dashboard.
-// DEMO LOGIN ONLY: the backend has no auth endpoint yet, so this checks a
-// hard-coded account in the browser. Not real security. Replace demoLogin with
-// a fetch() to your backend later (throw an Error on wrong credentials).
-const DEMO_USER = 'demo'
-const DEMO_PASS = 'marketripple'
-async function demoLogin({ username, password }) {
-  if (username !== DEMO_USER || password !== DEMO_PASS) {
-    throw new Error('Wrong username or password.')
-  }
-  return { username }
-}
-
+// Flow: landing -> login -> dashboard (admins can open the admin panel from the header).
+// Accounts live in the backend database (see backend/app/auth). A saved token is re-checked on reload.
 export default function App() {
-  const [stage, setStage] = useState('landing') // 'landing' | 'login' | 'app'
-  if (stage === 'landing') return <Landing onLaunch={() => setStage('login')} />
-  if (stage === 'login') {
-    return <Login onLogin={demoLogin} onSuccess={() => setStage('app')} onBack={() => setStage('landing')} />
+  const [stage, setStage] = useState('landing') // 'landing' | 'login' | 'app' | 'admin'
+  const [user, setUser] = useState(null)
+
+  const signOut = useCallback(() => { logout(); setUser(null); setStage('login') }, [])
+  useEffect(() => { setUnauthorizedHandler(signOut) }, [signOut])
+
+  // reload while signed in: keep the session if the saved token is still valid
+  useEffect(() => {
+    if (!getToken()) return
+    getMe().then((u) => { setUser(u); setStage((s) => (s === 'landing' ? 'app' : s)) }).catch(() => logout())
+  }, [])
+
+  if (stage === 'landing') return <Landing onLaunch={() => setStage(user ? 'app' : 'login')} />
+  if (!user || stage === 'login') {
+    return (
+      <Login
+        onLogin={({ username, password }) => login(username, password)}
+        onSuccess={(res) => { setUser(res.user); setStage('app') }}
+        onBack={() => setStage('landing')}
+      />
+    )
   }
-  return <Dashboard />
+  if (stage === 'admin' && user.role === 'admin') {
+    return <Admin me={user} onBack={() => setStage('app')} onLogout={signOut} />
+  }
+  return <Dashboard user={user} onAdmin={() => setStage('admin')} onLogout={signOut} />
 }
