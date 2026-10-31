@@ -17,6 +17,11 @@ export default function useAnalysis() {
       const res = await analyze(news, simulated, ctrl.current.signal)
       // The backend answers with a canned "Sample data" graph when it cannot map a REAL story. Never show that
       // as if it were the story's analysis: keep the current graph and explain why instead.
+      // Real story the graph can't map: never show it, even when "simulated" is ticked.
+      if (res.meta?.unmapped && !USE_MOCK) {
+        setError(null)
+        return res
+      }
       if (res.mode === 'mock' && !simulated && !USE_MOCK) {
         const why = (res.warnings?.[0] ?? '').replace(/^Mock data:\s*/i, '').trim()
         setError("Couldn't map this story to the impact graph, so no sample graph is shown. "
