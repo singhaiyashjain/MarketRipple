@@ -15,18 +15,20 @@ from app.graph.linker import NodeLinker, infer_direction
 # LLM-proposed edges are unverified, so they may never look stronger than this.
 LLM_EDGE_WEIGHT_CAP = 0.4
 
-# (regex on normalised text, seed node id) - first match wins, order matters
+# (regex on normalised text, seed node id) - first match wins, order matters.
+# Word-bounded: "oil" used to match inside turmoil/soil/boil and "repo" inside report.
+_NOT_CRUDE = (r"(?<!palm )(?<!edible )(?<!olive )(?<!vegetable )(?<!cooking )(?<!mustard )(?<!coconut )"
+              r"(?<!sunflower )(?<!soybean )(?<!soya )(?<!groundnut )(?<!castor )(?<!essential )")
 KEYWORD_TO_NODE: list[tuple[str, str]] = [
-    (r"policy|repo|interest rate|rate hike|rate cut", "policy_rate"),
-    (r"crude|brent|oil", "crude"),
-    (r"usd/?inr|rupee|\binr\b|currency", "usdinr"),
-    (r"inflation|\bcpi\b", "inflation"),
-    (r"bond yield|g-?sec", "bond_yields"),
-    (r"\bfii\b|\bfpi\b|foreign (portfolio|investor)", "fii_flows"),
-    (r"nifty", "nifty"),
-    (r"reserve bank|\brbi\b", "rbi"),
+    (r"\bpolicy (?:interest |repo )?rates?\b|\brepo\b|\binterest rates?\b|\brate (?:hike|cut)s?\b|\bmonetary policy\b", "policy_rate"),
+    (r"\b(?:crude|brent|wti|opec)\b|" + _NOT_CRUDE + r"\boil\b(?! india\b| and natural gas\b| & natural gas\b)", "crude"),
+    (r"\busd/?inr\b|\brupee\b|\binr\b|\bcurrency\b", "usdinr"),
+    (r"\binflation\b|\bcpi\b", "inflation"),
+    (r"\bbond yields?\b|\bg-?secs?\b", "bond_yields"),
+    (r"\bfii\b|\bfpi\b|\bforeign (?:portfolio|investor)", "fii_flows"),
+    (r"\bnifty\b", "nifty"),
+    (r"\breserve bank\b|\brbi\b", "rbi"),
 ]
-
 
 def _clean(text: str | None) -> str:
     return (text or "").replace("_", " ").strip().lower()
