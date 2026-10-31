@@ -4,7 +4,59 @@ export const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 // Backend address. Empty = same site (local dev uses the Vite proxy). On GitHub Pages set VITE_API_URL to the Render URL.
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
-const fetch = (url, opts) => window.fetch(API_BASE + url, opts)
+
+// ---------------------------------------------------------------- login session (token kept for this browser tab only)
+const TOKEN_KEY = 'mr_token'
+let memToken = ''
+export const getToken = () => { try { return sessionStorage.getItem(TOKEN_KEY) || memToken } catch { return memToken } }
+export const setToken = (t) => {
+  memToken = t || ''
+  try { t ? sessionStorage.setItem(TOKEN_KEY, t) : sessionStorage.removeItem(TOKEN_KEY) } catch { /* storage blocked: memory only */ }
+}
+
+// every call goes through here, so the login token is attached in one place
+let onUnauthorized = null
+export const setUnauthorizedHandler = (fn) => { onUnauthorized = fn }
+const fetch = async (url, opts = {}) => {
+  const token = getToken()
+  const headers = token ? { ...(opts.headers || {}), Authorization: `Bearer ${token}` } : opts.headers
+  const r = await window.fetch(API_BASE + url, { ...opts, headers })
+  if (r.status === 401 && token && !url.startsWith('/api/auth/login')) onUnauthorized?.()   // token expired or account disabled
+  return r
+}
+
+async function authJson(url, method, body) {
+  const r = await fetch(url, { method, headers: body ? { 'Content-Type': 'application/json' } : undefined, body: body ? JSON.stringify(body) : undefined })
+  let data = null
+  try { data = await r.json() } catch { /* no body */ }
+  if (!r.ok) {
+    const d = data?.detail
+    throw new Error(typeof d === 'string' ? d : Array.isArray(d) ? d.map((x) => x.msg).join(' ') : `Server error ${r.status}`)
+  }
+  return data
+}
+
+// Mock mode (VITE_USE_MOCK=true, no backend) keeps a demo account so the UI can still be previewed.
+const MOCK_USER = { username: 'demo', role: 'admin', active: true }
+export async function login(username, password) {
+  if (USE_MOCK) {
+    if (username !== 'demo' || password !== 'marketripple') throw new Error('Wrong username or password.')
+    return { token: '', user: MOCK_USER }
+  }
+  const out = await authJson('/api/auth/login', 'POST', { username, password })
+  setToken(out.token)
+  return out
+}
+export const logout = () => setToken('')
+export const getMe = () => (USE_MOCK ? Promise.resolve(MOCK_USER) : authJson('/api/auth/me', 'GET'))
+export const changePassword = (current_password, new_password) =>
+  authJson('/api/auth/change-password', 'POST', { current_password, new_password })
+
+// ---------------------------------------------------------------- admin panel
+export const adminListUsers = () => authJson('/api/admin/users', 'GET')
+export const adminCreateUser = (username, password, role) => authJson('/api/admin/users', 'POST', { username, password, role })
+export const adminUpdateUser = (username, patch) => authJson(`/api/admin/users/${encodeURIComponent(username)}`, 'PATCH', patch)
+export const adminDeleteUser = (username) => authJson(`/api/admin/users/${encodeURIComponent(username)}`, 'DELETE')
 
 const MOCK_SAMPLES = [
   { id: 'oil_shock', title: 'Crude oil +12% (simulated)', simulated: true,
