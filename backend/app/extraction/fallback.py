@@ -92,7 +92,7 @@ def rule_based_extract(news: str) -> ExtractedEvent:
 
     # 2) rupee move vs 3) crude oil: if a text mentions both, the one named first is the headline
     inr = re.search(r"\b(rupee|inr)\b", text, re.I)
-    oil = re.search(text)
+    oil = _crude_match(text)
     if inr and not (oil and oil.start() < inr.start()):
         # entity is the pair; rupee falling => USD/INR increases
         weak = re.search(r"\b(fall[s]?|fell|slump\w*|weaken\w*|deprecia\w+|record low|slide[s]?|plunge\w*|sink\w*|tumbl\w+)\b", text, re.I)
