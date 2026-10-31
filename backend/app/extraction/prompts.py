@@ -46,3 +46,14 @@ These are hypotheses, not facts: do not claim certainty and do not give probabil
 EVENT: {event}
 NODES: {nodes}
 """
+
+LINK_PROMPT = """You link ONE financial news event to the closest DRIVER node of an existing economic knowledge graph.
+Pick the single node in NODES that this event most directly moves (the first domino), so the graph can show what it
+affects downstream. Use ONLY an id from NODES. If nothing in NODES is a sensible first domino, use null.
+Also say whether that node goes up or down because of the event: "increase" | "decrease" | "unknown".
+
+Return ONLY a JSON object: {{"node": "<node id or null>", "direction": "increase" | "decrease" | "unknown", "reason": "<one short sentence>"}}
+
+EVENT: {event}
+NODES: {nodes}
+"""
