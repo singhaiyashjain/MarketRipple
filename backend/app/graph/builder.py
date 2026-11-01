@@ -76,12 +76,36 @@ def _event_label(event: ExtractedEvent, node_label: str) -> str:
     return f"{node_label} {move}"
 
 
+def _llm_link(event: ExtractedEvent, G: nx.DiGraph) -> tuple[str | None, str | None]:
+    """No keyword/NLP match: ask the LLM which DRIVER node of the curated graph this event moves.
+    It can only pick an existing node id. Any failure -> (None, None) = honestly 'not mapped'."""
+    from app.extraction import llm_client
+    from app.extraction.prompts import LINK_PROMPT
+    cands = [{"id": n, "label": d.get("label", n)} for n, d in G.nodes(data=True)
+             if G.out_degree(n) > 0 and d.get("type") != "event"]
+    try:
+        data = llm_client.complete_json(LINK_PROMPT.format(event=event.model_dump_json(),
+                                                           nodes=json.dumps(cands, ensure_ascii=False)))
+    except Exception:
+        return None, None
+    if isinstance(data, list) and data:
+        data = data[0]
+    if not isinstance(data, dict) or data.get("node") not in {c["id"] for c in cands}:
+        return None, None
+    d = data.get("direction")
+    return data["node"], (d if d in ("increase", "decrease") else None)
+  
 def build_graph(event: ExtractedEvent, use_llm: bool = True) -> nx.DiGraph:
     G = load_seed_graph()
     G.graph["warnings"] = []
     G.graph["event_node"] = None
 
     target, method, score = match_seed_node(event, G)
+    llm_dir = None
+    if target is None and use_llm:                      # nothing matched: let the LLM pick the closest driver node
+        target, llm_dir = _llm_link(event, G)
+        if target:
+            method, score = "llm_link", 1.0
     G.graph["link"] = {"node": target, "method": method, "score": score}
     if target is None:
         G.graph["warnings"].append(
@@ -91,16 +115,24 @@ def build_graph(event: ExtractedEvent, use_llm: bool = True) -> nx.DiGraph:
     if method == "nlp_semantic":
         G.graph["warnings"].append(
             f"Event linked to '{G.nodes[target]['label']}' by NLP similarity (score {score}); please verify.")
+    if method == "llm_link":
+        G.graph["warnings"].append(
+            f"Event linked to '{G.nodes[target]['label']}' by the language model (closest driver in the curated graph); please verify.")
     if not event.direction or event.direction == "unknown":       # NLP fallback when the extractor gave none
         guess = infer_direction(event.change, event.driver, event.event_type, event.entity)
         if guess:
             event.direction = guess
-    sign, warn = _event_sign(event, target)
+    if llm_dir:                                          # direction of the LINKED node, as judged by the LLM
+        sign, warn = (1 if llm_dir == "increase" else -1), None
+    else:
+        sign, warn = _event_sign(event, target)
     if warn:
         G.graph["warnings"].append(warn)
 
     ev_id = f"ev_{target}"
-    G.add_node(ev_id, label=_event_label(event, G.nodes[target]["label"]), type="event", sector=None)
+    ev_label = (f"{G.nodes[target]['label']} {'up' if sign > 0 else 'down'}" if llm_dir
+                else _event_label(event, G.nodes[target]["label"]))
+    G.add_node(ev_id, label=ev_label, type="event", sector=None)
     G.add_edge(
         ev_id, target,
         id="e_event", relationship="triggers", sign=sign, weight=1.0,
