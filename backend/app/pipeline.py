@@ -50,15 +50,14 @@ def run_analysis(req: AnalyzeRequest) -> AnalyzeResponse:
     try:
         event = extract_event(req.news, use_llm=req.use_llm)
     except NotImplementedError:
-          return _unmapped(event, "no impact paths found for this event: " + " ".join(warnings))
+        return _mock(req, "stage 'extraction' not implemented yet")
     event.is_simulated = event.is_simulated or req.simulated
 
     G = build_graph(event, use_llm=req.use_llm)
     warnings: list[str] = list(G.graph.get("warnings", []))
     paths = find_paths(G, event)
     if not paths:
-        return _mock(req, "no impact paths found for this event: " + " ".join(warnings), unmapped=True)
-
+        return _unmapped(event, "no impact paths found for this event: " + " ".join(warnings))
     real, skipped = ["extraction", "graph", "impact"], []
 
     def optional(name: str, fn):
