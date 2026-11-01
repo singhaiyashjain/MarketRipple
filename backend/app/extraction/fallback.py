@@ -7,7 +7,7 @@ import re
 from app.schemas import ExtractedEvent
 
 _UP = r"surge[sd]?|surging|rise[sn]?|rising|rose|jump(?:s|ed|ing)?|climb(?:s|ed|ing)?|spik(?:e|es|ed|ing)|soar(?:s|ed|ing)?|rall(?:y|ies|ied)|gain(?:s|ed)?|hike[sd]?|raise[sd]?|increase[sd]?|higher"
-_DOWN = r"fall[s]?|fell|falling|drop(?:s|ped|ping)?|plunge[sd]?|plunging|slump(?:s|ed|ing)?|declin(?:e|es|ed|ing)|tumbl(?:e|es|ed|ing)|slid(?:e|es|ing)?|crash(?:es|ed|ing)?|sink[s]?|sank|cut[s]?|lower(?:s|ed)?|reduce[sd]?|weaken(?:s|ed|ing)?|deprecia\w+|lower"
+_DOWN = r"fall[s]?|fell|falling|drop(?:s|ped|ping)?|plunge[sd]?|plunging|slump(?:s|ed|ing)?|declin(?:e|es|ed|ing)|tumbl(?:e|es|ed|ing)|slid(?:e|es|ing)?|crash(?:es|ed|ing)?|sink[s]?|sank|cut[s]?|lower(?:s|ed)?|reduce[sd]?|weaken(?:s|ed|ing)?|deprecia\w+|eas(?:e|es|ed|ing)|soften\w*|moderat\w+|cool(?:s|ed|ing)?|dip(?:s|ped)?|slip(?:s|ped)?|shrink\w*|narrow\w*|retreat\w*|lower"
 
 _PCT = re.compile(r"(\d+(?:\.\d+)?)\s*(?:%|per\s?cent|percent)", re.I)
 _BPS = re.compile(r"(\d+(?:\.\d+)?)\s*(?:basis\s+points?|bps|bp)\b", re.I)
@@ -28,7 +28,7 @@ _DRIVERS = [
 _NON_CRUDE_OIL = re.compile(
     r"\b(?:palm|edible|olive|vegetable|cooking|mustard|coconut|sunflower|soybean|soya|groundnut|castor|essential|"
     r"fish|engine|lubricating|hair|baby|massage)\s+oils?\b|\boil\s+india\b|\boil\s+(?:and|&)\s+natural\s+gas\b|"
-    r"\boil\s+marketing\s+compan\w+|\boil\s+ministry\b", re.I)
+    r"\boil\s+marketing\s+compan\w+|\boil\s+ministry\b|\bindian\s+oil\b", re.I))
 _CRUDE = re.compile(r"\b(crude|brent|wti|opec|oil prices?|oil)\b", re.I)
 
 
@@ -74,6 +74,8 @@ _FLOW_OUT = re.compile(r"\b(?:sell(?:s|ing)?|sold|outflows?|pull(?:s|ed)? out|ex
 _FLOW_IN = re.compile(r"\b(?:buy(?:s|ing)?|bought|inflows?|pour(?:s|ed)?|invest(?:s|ed)? )\b", re.I)
 _DE_ESC = re.compile(r"\b(?:ceasefire|truce|de-?escalat\w*|eas(?:e|es|ed|ing)|calm\w*|peace|talks)\b", re.I)
 _TOPICS = [
+    (re.compile(r"\b(?:omcs?|oil marketing|indian oil|bpcl|hpcl|iocl|oil retailers?)\b", re.I),
+     "Oil Marketing Company Margins", "omc", "dir"),
     (re.compile(r"\b(?:bond yields?|g-?secs?|treasury yields?|10-year (?:bond|g-?sec))\b", re.I),
      "Bond Yields", "bond_yields", "dir"),
     (re.compile(r"\bfood (?:prices?|inflation)\b|\b(?:vegetable|cereal|wheat|rice|pulses?|onion|tomato|edible oil|palm oil)s?\b[^.]{0,50}\bprices?\b", re.I),
