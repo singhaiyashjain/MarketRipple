@@ -69,6 +69,60 @@ def _date(text: str) -> str | None:
     return m.group(1) if m else None
 
 
+# Macro topics the curated graph covers, so common headlines map WITHOUT an LLM.
+_FLOW_OUT = re.compile(r"\b(?:sell(?:s|ing)?|sold|outflows?|pull(?:s|ed)? out|exit(?:s|ed)?|dump(?:s|ed)?|withdraw\w*)\b", re.I)
+_FLOW_IN = re.compile(r"\b(?:buy(?:s|ing)?|bought|inflows?|pour(?:s|ed)?|invest(?:s|ed)? )\b", re.I)
+_DE_ESC = re.compile(r"\b(?:ceasefire|truce|de-?escalat\w*|eas(?:e|es|ed|ing)|calm\w*|peace|talks)\b", re.I)
+_TOPICS = [
+    (re.compile(r"\b(?:bond yields?|g-?secs?|treasury yields?|10-year (?:bond|g-?sec))\b", re.I),
+     "Bond Yields", "bond_yields", "dir"),
+    (re.compile(r"\bfood (?:prices?|inflation)\b|\b(?:vegetable|cereal|wheat|rice|pulses?|onion|tomato|edible oil|palm oil)s?\b[^.]{0,50}\bprices?\b", re.I),
+     "Food Prices", "food_prices", "dir"),
+    (re.compile(r"\b(?:inflation|cpi|wpi)\b", re.I),
+     "Inflationary Pressure", "inflation", "dir"),
+    (re.compile(r"\b(?:fiis?|fpis?|foreign (?:portfolio|institutional) investors?|foreign investors?)\b", re.I),
+     "Foreign Portfolio Flows", "fii_flows", "flow"),
+    (re.compile(r"\b(?:fed|federal reserve|fomc)\b", re.I),
+     "US Fed Policy Rate", "fed_rate", "dir"),
+    (re.compile(r"\b(?:dollar index|dxy|dollar (?:strengthens?|surges?|rall(?:y|ies)|weakens?|slides?|gains?))\b", re.I),
+     "US Dollar Index", "dxy", "dir"),
+    (re.compile(r"\b(?:fiscal deficit|government borrowing)\b", re.I),
+     "Fiscal Deficit", "fiscal_deficit", "dir"),
+    (re.compile(r"\b(?:gdp|economic growth)\b", re.I),
+     "Economic Growth (GDP)", "gdp_growth", "dir"),
+    (re.compile(r"\bhousing (?:demand|sales)\b|\bhome loans?\b", re.I),
+     "Housing Demand", "housing_demand", "dir"),
+    (re.compile(r"\bcement\b", re.I), "Cement Demand", "cement_demand", "dir"),
+    (re.compile(r"\b(?:auto|vehicle|car|two-wheeler) sales\b", re.I), "Vehicle Demand", "auto_demand", "dir"),
+    (re.compile(r"\bdeposit rates?\b", re.I), "Deposit Rates", "deposit_rates", "dir"),
+    (re.compile(r"\b(?:consumer demand|consumption)\b", re.I), "Consumer Demand", "consumer_demand", "dir"),
+    (re.compile(r"\b(?:iran|israel|hormuz|red sea|ukraine|russia|war|missiles?|airstrikes?|ceasefire|sanctions?|geopolitical)\b", re.I),
+     "Geopolitical Tension Risk", "geo_risk", "geo"),
+]
+
+
+def _topic_event(text: str, pct, common: dict):
+    for pat, entity, indicator, mode in _TOPICS:
+        if not pat.search(text):
+            continue
+        if mode == "flow":
+            out, inn = _FLOW_OUT.search(text), _FLOW_IN.search(text)
+            d = "decrease" if out and not (inn and inn.start() < out.start()) else "increase" if inn else _direction(text)
+        elif indicator == "dxy":                       # read the move of the DOLLAR, not of the rest of the headline
+            m = re.search(r"dollar(?: index)?\s+(?:\w+\s+){0,2}?(strengthens?|surges?|rall\w+|gains?|rises?|firms?|jumps?|"
+                          r"weakens?|slides?|falls?|drops?|declin\w+|slumps?|slips?)\b", text, re.I)
+            d = (("increase" if re.match(r"strength|surge|rall|gain|rise|firm|jump", m.group(1), re.I) else "decrease")
+                 if m else _direction(text))
+        elif mode == "geo":
+            d = "decrease" if _DE_ESC.search(text) else "increase"      # tension rises unless it is de-escalating
+        else:
+            d = _direction(text)
+        change = f"{'-' if d == 'decrease' else '+'}{pct.group(1)}%" if (pct and d != "unknown") else None
+        return ExtractedEvent(event_type="other", entity=entity, indicator=indicator, direction=d, change=change,
+                              change_pct=float(pct.group(1)) if pct else None, **common)
+    return None
+
+
 def rule_based_extract(news: str) -> ExtractedEvent:
     text = " ".join(news.split())
     common = dict(driver=_driver(text), country=_country(text), event_date=_date(text))
@@ -95,7 +149,7 @@ def rule_based_extract(news: str) -> ExtractedEvent:
     oil = _crude_match(text)
     if inr and not (oil and oil.start() < inr.start()):
         # entity is the pair; rupee falling => USD/INR increases
-        weak = re.search(r"\b(fall[s]?|fell|slump\w*|weaken\w*|deprecia\w+|record low|slide[s]?|plunge\w*|sink\w*|tumbl\w+)\b", text, re.I)
+        weak = re.search(r"\b(fall[s]?|fell|slump\w*|weaken\w*|deprecia\w+|record low|slide[s]?|slip\w*|dip\w*|plunge\w*|sink\w*|tumbl\w+)\b", text, re.I)
         strong = re.search(r"\b(strengthen\w*|apprecia\w+|gain[s]?|rall(?:y|ies|ied)|rise[s]?|rose|surge[sd]?)\b", text, re.I)
         if weak and not (strong and strong.start() < weak.start()):
             d, et = "increase", "currency_depreciation"
@@ -115,7 +169,12 @@ def rule_based_extract(news: str) -> ExtractedEvent:
                               indicator="crude_oil_price", direction=d, change=change,
                               change_pct=float(pct.group(1)) if pct else None, **common)
 
-    # 4) nothing we can recognise offline
+    # 4) common macro topics (bond yields, inflation, FII flows, Fed, GDP, geopolitics ...)
+    topic = _topic_event(text, pct, common)
+    if topic:
+        return topic
+
+    # 5) nothing we can recognise offline
     return ExtractedEvent(event_type="other", entity="Unclassified financial event",
                           indicator=None, direction="unknown", change=None, change_pct=None,
                           **common)
