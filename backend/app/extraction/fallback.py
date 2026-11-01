@@ -28,7 +28,7 @@ _DRIVERS = [
 _NON_CRUDE_OIL = re.compile(
     r"\b(?:palm|edible|olive|vegetable|cooking|mustard|coconut|sunflower|soybean|soya|groundnut|castor|essential|"
     r"fish|engine|lubricating|hair|baby|massage)\s+oils?\b|\boil\s+india\b|\boil\s+(?:and|&)\s+natural\s+gas\b|"
-    r"\boil\s+marketing\s+compan\w+|\boil\s+ministry\b|\bindian\s+oil\b", re.I))
+    r"\boil\s+marketing\s+compan\w+|\boil\s+ministry\b|\bindian\s+oil\b", re.I)
 _CRUDE = re.compile(r"\b(crude|brent|wti|opec|oil prices?|oil)\b", re.I)
 
 
